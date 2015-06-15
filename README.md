@@ -1,4 +1,4 @@
-Building consistent environemnts with Vagrant and Ansible
+Using a great workflow: Github + TravisCI + Pantheon.
 ========================================================
 
-Slides for this session presented at *Drupaleada Marzo 2015*.
+Slides for this session.
