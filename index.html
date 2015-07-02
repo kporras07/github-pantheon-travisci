@@ -4,9 +4,9 @@
     <head>
         <meta charset="utf-8">
 
-        <title>Cómo montar ambientes de desarrollo consistentes con Vagrant y Ansible</title>
+        <title>Usando flujos de trabajo exitosos: Github + TravisCI + Pantheon</title>
 
-        <meta name="description" content="Cómo montar ambientes de desarrollo consistentes con Vagrant y Ansible">
+        <meta name="description" content="Usando flujos de trabajo exitosos: Github + TravisCI + Pantheon">
         <meta name="author" content="kporras07">
 
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -44,26 +44,52 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
             <!-- Any section element inside of this container is displayed as a slide -->
             <div class="slides">
                 <section>
-                    <h1>Vagrant y Ansible</h1>
-                    <h3>Cómo montar ambientes de desarrollo consistentes?</h3>
+                    <h2>Github + TravisCI + Pantheon</h2>
+                    <h3>Usando flujos de trabajo exitosos</h3>
                     <p>
                     <small><a href="http://kporras07.tk">Kporras07</a> / <a href="http://twitter.com/kporras07">@kporras07</a></small>
                     </p>
                 </section>
 
                 <section>
-                    <h2><q>"But it works on my machine"</q></h2>
+                    <h2>Kevin Jesús Porras Zumbado</h2>
+                    <ul>
+                        <li>Drupal Backend Developer - Manatí</li>
+                    </ul>
                 </section>
 
                 <section>
-                    <h2>Qué vamos a ver?</h2>
-                    <ul>
-                        <li>Qué es vagrant?</li>
-                        <li>Comandos básicos</li>
-                        <li>Vagrantfile</li>
-                        <li>Provisioners: Ansible</li>
-                        <li>Ejemplos</li>
-                    </ul>
+                    <section>
+                        <h2>Qué vamos a hacer?</h2>
+                    </section>
+
+                    <section>
+                        <h2>Github</h2>
+                        <ul>
+                            <li>Repositorio Principal</li>
+                            <li>Gestión de Issues</li>
+                            <li>Pull Requests</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>TravisCI</h2>
+                        <ul>
+                            <li>Integración continua</li>
+                            <li>Build del sitio en cada push a una rama</li>
+                            <li>Build del sitio en cada Pull Request (integrar con Pantheon multidev)</li>
+                            <li>Si es push a master, hacer push a pantheon</li>
+                            <li>Notificar de los builds a un canal de Slack</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Pantheon</h2>
+                        <ul>
+                            <li>Workflow dev-test-live</li>
+                            <li>Multidev</li>
+                        </ul>
+                    </section>
                 </section>
 
                 <!-- Example of nested vertical slides -->
