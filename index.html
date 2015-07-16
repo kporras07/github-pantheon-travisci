@@ -92,367 +92,83 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
                     </section>
                 </section>
 
-                <!-- Example of nested vertical slides -->
                 <section>
                     <section>
-                        <h2>Qué es vagrant?</h2>
-                        <p><q>Vagrant provides easy to configure, reproducible, and portable work environments built on top of industry-standard technology and controlled by a single consistent workflow to help maximize the productivity and flexibility of you and your team.</q></p>
+                        <h2>Qué necesitamos?</h2>
                     </section>
+
                     <section>
-                        <h2>Puede utilizarse con:</h2>
-                        <h4>(Providers)</h4>
+                        <h2>Github</h2>
                         <ul>
-                            <li>VirtualBox</li>
-                            <li>VMWare</li>
-                            <li>KVM</li>
-                            <li>AWS</li>
-                            <li>DigitalOcean</li>
+                            <li>Tu Cuenta de Github</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>TravisCI</h2>
+                        <ul>
+                            <li>Cuenta de Travis CI (linkeada a tu cuenta de Github)</li>
+                            <li>Cliente de Travis CI (<a href="https://github.com/travis-ci/travis.rb#installation" target="_blank">Instrucciones</a>)</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>Pantheon</h2>
+                        <ul>
+                            <li>Tu Cuenta de Pantheon</li>
+                            <li>Una cuenta de Pantheon adicional con acceso al sitio (no olvidar e-mail/password)</li>
+                            <li>Par de llaves pública/privada para la cuenta adicional de Pantheon. Subir la pública.</li>
+                            <li>Un sitio de Pantheon</li>
                         </ul>
                     </section>
                 </section>
 
                 <section>
-                    <h2>Comandos Básicos</h2>
+                    <h2>Preparando el Repositorio</h2>
                     <ul>
-                        <li class="fragment roll-in">vagrant init</li>
-                        <li class="fragment roll-in">vagrant up</li>
-                        <li class="fragment roll-in">vagrant ssh</li>
-                        <li class="fragment roll-in">vagrant halt</li>
-                        <li class="fragment roll-in">vagrant provision</li>
-                        <li class="fragment roll-in">vagrant reload</li>
-                        <li class="fragment roll-in">vagrant suspend</li>
-                        <li class="fragment roll-in">vagrant resume</li>
-                        <li class="fragment roll-in">vagrant status</li>
-                        <li class="fragment roll-in">vagrant global-status</li>
+                        <li class="fragment roll-in">Clonar repo de Pantheon</li>
+                        <li class="fragment roll-in">Agregar archivo .travis.yml</li>
+                        <li class="fragment roll-in">Commit de este archivo</li>
+                        <li class="fragment roll-in">Crear repo vacío de Github</li>
+                        <li class="fragment roll-in">Agregar el remote de github</li>
+                        <li class="fragment roll-in">Push a Pantheon y a Github</li>
+                        <li class="fragment roll-in">Habilitar Travis CI para el repo de Github (https://travis-ci.org/profile/{username})</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>.travis.yml</h2>
+                    <ul>
+                        <li>Poner archivo por segmentos en pre y con explicaciones</li>
                     </ul>
                     <aside class="notes">
                         <pre><code>
-vagrant init hashicorp/precise64
-vagrant up
--------------------------------
-Todos los comandos soportan ID para ejecutar en esa MV.
-
-reload = halt + up
-global-status --prune
-up --provision
                         </code></pre>
                     </aside>
                 </section>
 
                 <section>
-                    <section>
-                        <h2>Vagrantfile</h2>
-                        <ul>
-                            <li>config.ssh.forward_agent</li>
-                            <li>config.vm.box</li>
-                            <li>config.vm.hostname</li>
-                            <li>config.vm.provider</li>
-                            <li>config.vm.network</li>
-                            <li>config.vm.synced_folder</li>
-                            <li>config.vm.provision</li>
-                        </ul>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.ssh.forward_agent</h2>
+                    <h2>Demo On-The-Fly</h2>
+                    <ul>
+                        <li>Demo haciendo todo el proceso</li>
+                    </ul>
+                    <aside class="notes">
                         <pre><code>
-config.ssh.forward_agent = true
                         </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.box</h2>
-                        <pre><code>
-config.vm.box = "hashicorp/precise64"
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.hostname</h2>
-                        <pre><code>
-config.vm.hostname = "local-dev"
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.provider</h2>
-                        <pre><code>
-# VirtualBox specific configuration.
-config.vm.provider :virtualbox do |vb|
-  vb.customize ["modifyvm", :id, "--memory", "2048"]
-  vb.customize ["modifyvm", :id, "--cpus", "2"]
-  vb.customize ["modifyvm", :id, "--name", "Manati Box"]
-end
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.network</h2>
-                        <pre><code>
-config.vm.network :private_network, ip: "10.10.10.10"
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.synced_folder</h2>
-                        <pre><code>
-config.vm.synced_folder "../../www", "/home/vagrant/www",
-  type: "nfs", create: true
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.provision</h2>
-                        <pre><code>
-config.vm.provision "shell", inline: "echo hello"
-                        </code></pre>
-                    </section>
+                    </aside>
                 </section>
 
                 <section>
-                    <section>
-                        <h2>Provisioners</h2>
-                        <p><q>Provisioners in Vagrant allow you to automatically install software, alter configurations, and more on the machine as part of the vagrant up process.</q></p>
-                        <aside class="notes">
-                            <p>Mencionar puppet, chef y shell</p>
-                        </aside>
-                    </section>
-                    <section>
-                        <h2>Ansible</h2>
-                        <p><q>Ansible is the simplest way to automate.</q><p>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">config.vm.provision</h2>
+                    <h2>Demo ci-demo</h2>
+                    <ul>
+                        <li>Demo con proyecto existente (ci-demo(</li>
+                    </ul>
+                    <aside class="notes">
                         <pre><code>
-config.vm.provision "ansible" do |ansible|
-  ansible.playbook = "../site.yml"
-  ansible.extra_vars = "./group_vars/all"
-end
                         </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">site.yml</h2>
-                        <pre><code>
----
-# The main playbook to deploy the site
-
-- hosts: all
-  sudo: yes
-  roles:
-   - web
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2>Ansible Roles</h2>
-                        <p><q>Roles in Ansible build on the idea of include files and combine them to form clean, reusable abstractions – they allow you to focus more on the big picture and only dive down into the details when needed.</q></p>
-                    </section>
-                    <section>
-                        <h2>Estructura</h2>
-                        <ul>
-                            <li>
-                                defaults/
-                                <ul>
-                                    <li>main.yml</li>
-                                </ul>
-                            </li>
-                            <li>files/</li>
-                            <li>
-                                handlers/
-                                <ul>
-                                    <li>main.yml</li>
-                                </ul>
-                            </li>
-                            <li>
-                                tasks/
-                                <ul>
-                                    <li>main.yml</li>
-                                    <li>others.yml</li>
-                                </ul>
-                            </li>
-                            <li>templates/</li>
-                        </ul>
-                        <aside class="notes">
-                            <ul>
-                                <li>defaults es para variables en templates.</li>
-                                <li>files con cualquier estructura</li>
-                                <li>handlers para servicios</li>
-                                <li>tasks se incluyen en main.yml</li>
-                                <li>templates en .j2 con sustitución de variables</li>
-                                <ul>
-                        </aside>
-                    </section>
+                    </aside>
                 </section>
 
-                <section>
-                    <section>
-                        <h2>Ejemplo</h2>
-                        <p>Vamos a crear un servidor con Nginx+PHP5-FPM (Tomado de vagrant cookbook)</p>
-                    </section>
-                    <section>
-                        <h2>Estructura</h2>
-                        <ul>
-                            <li>playbook.yml</li>
-                            <li>
-                                roles/
-                                <ul>
-                                    <li>
-                                        init/
-                                        <ul>
-                                            <li>
-                                                tasks/
-                                                <ul>
-                                                    <li>main.yml</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        nginxphp/
-                                        <ul>
-                                            <li>
-                                                handlers/
-                                                <ul>
-                                                    <li>main.yml</li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                tasks/
-                                                <ul>
-                                                    <li>main.yml</li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                templates/
-                                                <ul>
-                                                    <li>default.tpl</li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>Vagrantfile</li>
-                        </ul>
-                    </section>
 
-                    <section>
-                        <h2 class="lowercase">playbook.yml</h2>
-                        <pre><code>
----
-
-- hosts: all
-  sudo: true
-  vars:
-    doc_root: /vagrant/web
-    server_name: "{{ ansible_eth1.ipv4.address }}"
-    sys_packages: ['curl', 'vim', 'git']
-    php_packages: ['php5-curl', 'php5-cli']
-  roles:
-   - init
-   - nginxphp
-                        </code></pre>
-                        <aside class="notes">
-                            ansible facts, quotes (dictionary)
-                        </aside>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">roles/init/tasks/main.yml</h2>
-                        <pre><code>
----
-
-- name: Update apt
-  apt: update_cache=yes
-
-- name: Install Sys Packages
-  apt: pkg={{ item }} state=latest
-  with_items: sys_packages
-
-- name: Make sure python-software-properties is installed
-  apt: pkg=python-software-properties state=latest
-
-- name: Add ppa Repository
-  apt_repository: repo:'ppa:ondrej/php5'
-
-- name: Update apt
-  apt: update_cache=yes
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">roles/nginxphp/tasks/main.yml</h2>
-                        <pre><code>
----
-
-- name: Install Nginx
-  apt: pkg=nginx state=latest
-
-- name: Install php5-fpm
-  apt: pkg=php5-fpm state=latest
-
-- name: Change default nginx site
-  template: src=templates/nginx/default.tpl dest=/etc/nginx/sites-available/default
-  notify: restart nginx
-
-- name: Install PHP Packages
-  apt: pkg={{ item }} state=latest
-  with_items: php_packages
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">roles/nginxphp/handlers/main.yml</h2>
-                        <pre><code>
----
-
-- name: restart nginx
-  service: name=nginx state=restarted
-
-- name: restart php5-fpm
-  service: name=php5-fpm state=restarted
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">roles/nginxphp/templates/default.tpl</h2>
-                        <pre><code>
-server {
-    listen  80
-
-    root {{ doc_root }};
-    index index.html index.php;
-
-    server_name {{ server_name }};
-
-    location = / {
-        try_files $uri $uri/ /index.php;
-    }
-
-    error_page 404 /404.html;
-
-    error_page 500 502 503 504 /50x.html;
-
-    location = 50x.html {
-        root /usr/share/nginx/www;
-    }
-
-    location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass unix:/var/wun/php5-fpm.sock;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-}
-                        </code></pre>
-                    </section>
-                    <section>
-                        <h2 class="lowercase">Vagrantfile</h2>
-                        <pre><code>
-Vagrant.configure("2") do |config|
-
-    config.vm.box = "hashicorp/precise64"
-    config.vm.network :private_network, ip: "192.168.33.101"
-    config.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
-    end
-                        </code></pre>
-                    </section>
-
-                </section>
-                <section>
-                    <h2>Bonus</h2>
-                    <a href="https://github.com/ManatiCR/vagrant-playbooks" target="_blank">Manatí vagrant-playbooks</a>
-                </section>
                 <section>
                     <h2>Referencias</h2>
                     <ul>
@@ -473,13 +189,14 @@ Vagrant.configure("2") do |config|
                         </li>
                     </ul>
                 </section>
+
                 <section>
                     <h1>Muchas Gracias</h1>
                     <p>kevin@estudiomanati.com</p>
                     <p>https://twitter.com/kporras07</p>
                     <p>https://github.com/kporras07</p>
                     <br/>
-                    <p>Slides disponibles en: <br/>http://kporras07.tk/Vagrant-Ansible-Drupal-Slides/</p>
+                    <p>Slides disponibles en: <br/>http://kporras07.tk/github-pantheon-travisci/</p>
                 </section>
 
             </div>
