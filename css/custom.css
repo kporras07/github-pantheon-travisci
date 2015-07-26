@@ -1,4 +1,4 @@
-h2.lowercase {
+h1.lowercase, h2.lowercase, h3.lowercase, h4.lowercase {
   text-transform: none;
 }
 .reveal pre code {
