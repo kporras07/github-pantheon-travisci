@@ -138,12 +138,14 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 
                 <section>
                     <h2>Encriptar variables con Travis CLI</h2>
+                    <pre><code>travis encrypt SOMEVAR=secretvalue</code></pre>
                 </section>
 
                 <section>
-                    <h2 class="lowercase">.travis.yml</h2>
-                    <h4 class="lowercase">Project Setup</h4>
-                    <pre><code>
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">Project Setup</h4>
+                        <pre><code>
 
 # Define project language. See http://docs.travis-ci.com/user/languages/
 language: php
@@ -168,7 +170,106 @@ env:
 # Travis encoded pantheon password
     - secure: "nphbuP7Cjz3VIdtNwAoeasy4Aw5pGyXYPt0dnXigjFYTeub9a8Ok7cA+uFmN/Ep1yibefvJ48uTXyf84WzSl11gGlGHho4R1QV1zYqu6vpoRsMu67VhALBe03DWdBWDKC+2thSdYXcVH4YqmMAqchOHCCvBtssXzUecTm4ghdjPezbg2sXaTyxSZduT5bGkq70e75mmVVF50UUsrZj5LboXCOTkDaxyVVTycJnMFbCJNBmIzmnLR1lti+C7eGbaxPsZhAYgLGWHeyT9UGs3AhLTu1QiYV6hevHx5/m0pIrZEuJPXClW9EHpGI7aaoVdExyD6Qv0pLqATCbV+BIF7PlycEt3CuecnnCCkwE6IRtFGBeIPdxa/o4QRWiPVsQ9cRPSXW8McBbVCBtcIWtMeJyjprRJWaxokYEyzO5/LqB2pINyWX42SWoHPOa2dEWy2iNImaMmOu8u1/aX6u254Z3p0OycsPWMEGuiZruqAzsBTGXlP/JnanNZwOMZ4iJp6lHdv7q6fzfdgIvkq/NvmYn/ETI37zUhm/a6kiM/Pmo5sIjc5CFFHZIwjXl5K4Zbl3hua5DgKpYuryUcsHMrBvouAl31CHgWozfOuFlrcRQBYQ2A+JvhChLck7qDWLCU9k0IfjDU/CW2Y71FeZXrCbFekYf+C1ijp8gnJ5g0uG2g="
     - PHOST='https://$PSITE-$PNAME.pantheon.io'
-                    </code></pre>
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">Before Install</h4>
+                        <pre><code>
+
+before_install:
+  - sudo apt-get update > /dev/null
+
+  - composer self-update
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">Install</h4>
+                        <pre><code>
+install:
+  # Avoid hanging due to ssh requiring host key check.
+  - echo "StrictHostKeyChecking no" > ~/.ssh/config
+  # install php packages required for running a web server from drush on php 5.3
+  - sudo apt-get install -y --force-yes php5-cgi php5-mysql
+
+  # install drush globally
+  - composer global require drush/drush:7.*
+
+  # add composer's global bin directory to the path
+  # see: https://github.com/drush-ops/drush#install---composer
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  # Install terminus.
+  - sudo curl https://github.com/pantheon-systems/cli/releases/download/0.5.5/terminus.phar -L -o /usr/local/bin/terminus && sudo chmod +x /usr/local/bin/terminus
+  - echo "sendmail_path='true'" >> `php --ini | grep "Loaded Configuration" | awk '{print $4}'`
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">Script</h4>
+                        <pre><code>
+
+script:
+  # stand up drupal
+  - cd $TRAVIS_BUILD_DIR
+  - composer install
+  - npm install && npm update
+  - cd sites/all/themes/manati
+  # run npm install on theme. TODO: Integrate with site npm config.
+  - npm install && npm update
+  - drush site-install manati -y --db-url=mysql://root@localhost/cidemo --db-su='root' --db-su-pw='' --site-name='CI-Demo'
+  - drush updb -y && drush fra -y
+  - drush cc all
+  # Run behat tests
+  - cd $TRAVIS_BUILD_DIR
+  - drush runserver --server=builtin 8082 --strict=0 &
+  - sleep 10
+  - grunt
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">After Script</h4>
+                        <pre><code>
+after_script:
+  - drush status
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">After Success</h4>
+                        <pre><code>
+after_success:
+  # Authenticate with Pantheon via Terminus.
+  - terminus auth login $PEMAIL --password=$PPASS
+  # On PR create an Pantheon env.
+  - if [ $TRAVIS_BRANCH = 'master' ] && [ $TRAVIS_PULL_REQUEST != 'false' ] ; then git remote add pantheon ssh://codeserver.dev.$PUUID@codeserver.dev.$PUUID.drush.in:2222/~/repository.git && git checkout -b $PSITE && git push --force pantheon $PSITE && terminus site create-env --site=$PNAME --env=$PSITE --from-env=$PSOURCE && terminus sites aliases && drush cc drush && cd $HOME && drush @pantheon.$PNAME.$PSITE updb -y --strict=0 && drush @pantheon.$PNAME.$PSITE fra -y --strict=0 && terminus site clear-caches --site=$PNAME --env=$PSITE ; fi
+  # On commits to github master; push them to pantheon master.
+  - if [ $TRAVIS_BRANCH = 'master' ] && [ $TRAVIS_PULL_REQUEST = 'false' ] ; then git remote add pantheon ssh://codeserver.dev.$PUUID@codeserver.dev.$PUUID.drush.in:2222/~/repository.git && git push pantheon $TRAVIS_BRANCH && terminus sites aliases && drush cc drush && cd $HOME && drush @pantheon.$PNAME.$TRAVIS_BRANCH updb -y --strict=0 && drush @pantheon.$PNAME.$TRAVIS_BRANCH fra -y --strict=0 ; fi
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2 class="lowercase">.travis.yml</h2>
+                        <h4 class="lowercase">Notifications</h4>
+                        <pre><code>
+notifications:
+#  irc: irc.freenode.org#elmsln
+
+#  email: false
+  slack:
+    rooms:
+      - secure: "krMbpPDhjEkP7G8VPb2CHuxpDbu3gnP8GjJpZl6FWz74vAi1M+oZ3RNKVUANQ/9A/pX1BmnhcKnCPBOzrBuDdPO8xDuVQ9rTmSYu8ZYXDy2UHHD/r0awaORc8TyZ3JeSFmGYCKTZBbTOl2sijuVQe3s1MO+XvPKJHZE40KHEEK1ytjJ8b5bWXlvzGYhsuqW6nRKir/19lyb5yEPnWMaEAxwjacLyeZn2LxNUFYdzcAMJuVoiU/9zNUuHLrBk2P/+/cXNH3yhR6VESB2deSF3k/mlPN4rlMK/IMazx+XF13SB0qsx/30CMlcZSsVk1n2myxisCWsV0ITBjiWQDJcPsgdR0EgFhkXsBKWXuHO8dhRoT1UsmHVXLrL9D0ite3PF50fCOtDVYiHMuWm9tFGKo2xzKqcuhcHjkCY68Co9fmTP4uEgMIf2uGrmJhVWrsmcDCVwWtMbwLu5n5TcX2U1a4rhYUnAvmAwiHoX+pmb00b3XbaM6Kl45/Uz40PhZRZ19+MhvGkx4FdMcR33h+TcaqnXY6YYuPSHAn4Cx9c72xn5rTsJ1EWWcKJBtv2kIxTfss0k7tB+UQHXvSJyQfmIyWrTsZ10PG97td2p1+IS1VzZmeIbqyCqDiUjBLSXmILE4ps9WNmCMXv/UWCGBFG+5oZTedIOh/AmEybA041l1AY="
+#      - elmsln:WmKTRMe7k3IjprunaAVV3Jjg#code
+
+
+                        </code></pre>
+                    </section>
                 </section>
 
 
@@ -176,19 +277,25 @@ env:
                     <h2>Referencias</h2>
                     <ul>
                         <li>
-                            <a href="https://www.vagrantup.com/" target="_blank">Vagrant</a>
+                            <a href="https://travis-ci.org/" target="_blank">Travis CI</a>
                         </li>
                         <li>
-                            <a href="https://docs.vagrantup.com/" target="_blank">Vagrant Documentation</a>
+                            <a href="http://docs.travis-ci.com/" target="_blank">Travis CI Documentation</a>
                         </li>
                         <li>
-                            <a href="http://www.ansible.com/home" target="_blank">Ansible</a>
+                            <a href="http://decks.eric.pe/pantheon-ci/" target="_blank">Continous Integration on Pantheon</a>
                         </li>
                         <li>
-                            <a href="https://docs.ansible.com/index.html" target="_blank">Ansible Documentation</a>
+                            <a href="https://pantheon.io/docs/articles/sites/multidev/" target="_blank">Multidev (Pantheon)</a>
                         </li>
                         <li>
-                            <a href="https://leanpub.com/vagrantcookbook" target="_blank">Vagrant Cookbook (Erika Heidi)</a>
+                            <a href="http://docs.travis-ci.com/user/migrating-from-legacy" target="_blank">Migrating from legacy to container-based infrastructure</a>
+                        </li>
+                        <li>
+                            <a href="http://kevinquillen.com/bdd/2014/06/06/behat-drupal/" target="_blank">Bonus: Up and Running with Behat, Drupal & Vagrant</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/kporras07/ci-demo" target="_blank">Bonus: CI Demo Repo</a>
                         </li>
                     </ul>
                 </section>
