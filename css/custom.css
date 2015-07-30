@@ -4,3 +4,10 @@ h1.lowercase, h2.lowercase, h3.lowercase, h4.lowercase {
 .reveal pre code {
   padding-left: 2rem;
 }
+.footer-image {
+  width: 200px;
+  position: relative;
+  right: 0;
+}
+.footer-image.last {
+}
